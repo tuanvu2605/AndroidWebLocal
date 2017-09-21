@@ -1,5 +1,6 @@
 package net.sinhviendev.androidweblocal;
 
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.webkit.WebView;
@@ -7,6 +8,9 @@ import android.webkit.WebView;
 import fi.iki.elonen.NanoHTTPD;
 import java.io.IOException;
 import java.io.*;
+import android.util.Log;
+import java.util.*;
+import java.lang.*;
 
 
 
@@ -68,9 +72,25 @@ public class MainActivity extends AppCompatActivity {
         public Response serve(IHTTPSession session) {
 
 
-            String msg = "<html><body><h1>Hello server</h1>\n";
-            msg += "<p>We serve " + session.getUri() + " !</p>";
-            return newFixedLengthResponse( msg + "</body></html>\n" );
+            String answer = "";
+            try {
+                // Open file from SD Card
+                File root = Environment.getExternalStorageDirectory();
+                FileReader index = new FileReader(root.getAbsolutePath() +
+                        "/app/www/index.html");
+                BufferedReader reader = new BufferedReader(index);
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    answer += line;
+                }
+                reader.close();
+
+            } catch(IOException ioe) {
+                Log.w("Httpd", ioe.toString());
+            }
+
+            return newFixedLengthResponse(answer);
+
         }
     }
 }
